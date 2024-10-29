@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { ActivityIndicator, Searchbar } from "react-native-paper";
 import { useNavigation } from "expo-router";
 import { getMangas } from "../../api/mangadex";
 import CardBook from "../../components/book-card";
 import { debounce } from "lodash";
+
 export default function BrowsePage() {
   const navigation = useNavigation();
   const [searchValue, setSearchValue] = useState("");
@@ -13,6 +14,7 @@ export default function BrowsePage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(10);
   const [total, setTotal] = useState(0);
+
   function handleSearch() {
     setMangas([]);
     setLoading(true);
@@ -21,12 +23,16 @@ export default function BrowsePage() {
     debounceGetManga();
   }
 
+  useEffect(() => {
+    getManga();
+  }, []);
+
   const debounceGetManga = debounce(() => getManga(), 500);
   const debounceGetMoreManga = debounce(() => getMoreManga(), 500);
 
   async function getManga() {
     try {
-      const dataManga = await getMangas(searchValue);
+      const dataManga = await getMangas(searchValue, 10, 0, 256);
       setMangas(dataManga);
       setTotal(dataManga.total);
     } catch (error) {
@@ -39,7 +45,7 @@ export default function BrowsePage() {
     try {
       if (mangas.length >= total) return;
       setLoadingMore(true);
-      const dataManga = await getMangas(searchValue, 10, offset);
+      const dataManga = await getMangas(searchValue, 10, offset, 256);
       setMangas((prevMangas) => [...prevMangas, ...dataManga]);
       setOffset((prevOffset) => prevOffset + 10);
     } catch (error) {
@@ -70,7 +76,7 @@ export default function BrowsePage() {
       {loading ? (
         <ActivityIndicator style={style.centerContent} />
       ) : mangas.length === 0 ? (
-        <Text style={style.centerContent}>No results found.</Text>
+        <Text style={style.centerContent}>No results found 🔍</Text>
       ) : (
         <FlatList
           data={mangas}

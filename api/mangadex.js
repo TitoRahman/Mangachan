@@ -8,10 +8,15 @@ const baseUrl = "https://api.mangadex.org";
  * @param {string} coverId - The ID of the cover image.
  * @returns {Promise<string>} - The URI of the cover image.
  */
-export const getMangaCoverUri = async (id, coverId) => {
+export const getMangaCoverUri = async (id, coverId, resolution) => {
   try {
     const coverResponse = await axios.get(`${baseUrl}/cover/${coverId}`);
     const fileName = coverResponse.data.data.attributes.fileName;
+    if (resolution === 256) {
+      return `https://uploads.mangadex.org/covers/${id}/${fileName}.256.jpg`;
+    } else if (resolution === 512) {
+      return `https://uploads.mangadex.org/covers/${id}/${fileName}.512.jpg`;
+    }
     return `https://uploads.mangadex.org/covers/${id}/${fileName}`;
   } catch (error) {
     console.error(`Failed to fetch cover URI for coverId ${coverId}:`, error);
@@ -95,7 +100,12 @@ export const getChapterUri = async (chapterId, page = -1) => {
  *       - {string} chapter - The chapter number.
  *       - {string} volume - The volume number.
  */
-export const getMangas = async (title = "", limit = 10, offset = 0) => {
+export const getMangas = async (
+  title = "",
+  limit = 10,
+  offset = 0,
+  resolution
+) => {
   try {
     const response = await axios.get(`${baseUrl}/manga`, {
       params: { title: title, limit: limit, offset: offset },
@@ -105,7 +115,11 @@ export const getMangas = async (title = "", limit = 10, offset = 0) => {
         const coverArtId = manga.relationships.find(
           (rel) => rel.type === "cover_art"
         ).id;
-        const coverArtUri = await getMangaCoverUri(manga.id, coverArtId);
+        const coverArtUri = await getMangaCoverUri(
+          manga.id,
+          coverArtId,
+          resolution
+        );
         const chapters = await getChapters(manga.id);
         return {
           id: manga.id,
