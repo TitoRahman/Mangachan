@@ -18,7 +18,7 @@ export default function CardBook({
     <Link
       href={{
         pathname: "/manga/detail",
-        params: { mangaId: id },
+        params: { mangaId: id, title: title },
       }}
     >
       <View style={styles.card}>

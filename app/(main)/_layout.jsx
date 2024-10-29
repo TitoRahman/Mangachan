@@ -50,8 +50,8 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen name="home" options={{ headerShown: false }} />
-      <Tabs.Screen name="bookmark" />
-      <Tabs.Screen name="browse" />
+      <Tabs.Screen name="bookmark" options={{ headerShown: true }} />
+      <Tabs.Screen name="browse" options={{ headerShown: true }} />
     </Tabs>
   );
 }

@@ -34,17 +34,23 @@ export const getMangaCoverUri = async (id, coverId, resolution) => {
  *   - {string} chapter - The chapter number.
  *   - {string} volume - The volume number.
  */
-export const getChapters = async (mangaId) => {
+export const getVolumes = async (mangaId) => {
   try {
     const response = await axios.get(`${baseUrl}/chapter`, {
       params: { manga: mangaId },
     });
-    return response.data.data.map((chapter) => ({
+    const vol = response.data.data.map((chapter) => ({
       id: chapter.id,
       title: chapter.attributes.title,
       chapter: chapter.attributes.chapter,
       volume: chapter.attributes.volume,
+      publishedAt: chapter.attributes.publishAt,
     }));
+    console.log(
+      `Fetched successfully ${vol.length} chapter for mangaId ${mangaId}.`
+    );
+    console.log(vol);
+    return vol;
   } catch (error) {
     console.error(`Failed to fetch chapters for mangaId ${mangaId}:`, error);
     throw error;
@@ -120,13 +126,11 @@ export const getMangas = async (
           coverArtId,
           resolution
         );
-        const chapters = await getChapters(manga.id);
         return {
           id: manga.id,
           title: manga.attributes.title.en,
           description: manga.attributes.description.en,
           coverArt: coverArtUri,
-          chapters: chapters,
           total: response.data.total,
         };
       })
