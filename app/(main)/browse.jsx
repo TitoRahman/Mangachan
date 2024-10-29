@@ -86,6 +86,7 @@ export default function BrowsePage() {
               cover={manga.coverArt}
               key={manga.id}
               title={manga.title}
+              id={manga.id}
             />
           )}
           onEndReachedThreshold={0.5}
