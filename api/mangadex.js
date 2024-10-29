@@ -80,6 +80,8 @@ export const getChapterUri = async (chapterId, page = -1) => {
 /**
  * Fetches mangas by title and includes their cover art and chapters.
  * @param {string} title - The title of the manga.
+ * @param {number} limit - The number of results to return.
+ * @param {number} offset - The number of results to skip.
  * @returns {Promise<Array<Object>>} - A list of mangas with their details.
  * Each manga object contains:
  *   - {string} id - The ID of the manga.
@@ -93,10 +95,10 @@ export const getChapterUri = async (chapterId, page = -1) => {
  *       - {string} chapter - The chapter number.
  *       - {string} volume - The volume number.
  */
-export const getMangas = async (title) => {
+export const getMangas = async (title = "", limit = 10, offset = 0) => {
   try {
     const response = await axios.get(`${baseUrl}/manga`, {
-      params: { title: title },
+      params: { title: title, limit: limit, offset: offset },
     });
     const mangas = await Promise.all(
       response.data.data.map(async (manga) => {
@@ -111,8 +113,12 @@ export const getMangas = async (title) => {
           description: manga.attributes.description.en,
           coverArt: coverArtUri,
           chapters: chapters,
+          total: response.data.total,
         };
       })
+    );
+    console.log(
+      `Fetched successfully ${mangas.length} mangas with title ${title} from offset ${offset}.`
     );
     return mangas;
   } catch (error) {

@@ -3,7 +3,7 @@ import { colors } from "../constant/colors";
 import React from "react";
 import CountryFlag from "react-native-country-flag";
 const defaultImage = require("../assets/imgNotFound.jpg");
-const cardSize = { width: 140 };
+const cardSize = { width: 170 };
 export default function CardBook({
   title,
   cover,
@@ -34,8 +34,17 @@ export default function CardBook({
           />
         </View>
       </View>
-      <View style={{ margin: 5 }}>
-        <Text style={styles.cardTitle}>{title}</Text>
+      <View
+        style={{
+          margin: 8,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        <Text style={styles.cardTitle}>
+          {title.length > 24 ? `${title.substring(0, 64)}...` : title}
+        </Text>
         <CountryFlag style={styles.cardLang} isoCode={langIso} size={14} />
       </View>
     </View>
@@ -56,7 +65,7 @@ const styles = StyleSheet.create({
     objectFit: "cover",
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
   },
   cardLang: {},

@@ -17,6 +17,8 @@ export default function TabLayout() {
               iconName = "bookmark";
             } else if (route.name === "browse") {
               iconName = "book";
+            } else if (route.name === "settings") {
+              iconName = "cog";
             }
 
             return (
@@ -44,11 +46,10 @@ export default function TabLayout() {
             );
           },
           tabBarActiveTintColor: colors.ghost_white[200],
-          headerShown: false,
         };
       }}
     >
-      <Tabs.Screen name="home" />
+      <Tabs.Screen name="home" options={{ headerShown: false }} />
       <Tabs.Screen name="bookmark" />
       <Tabs.Screen name="browse" />
     </Tabs>
