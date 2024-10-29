@@ -10,6 +10,7 @@ export default function BrowsePage() {
   const [searchValue, setSearchValue] = useState("");
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [offset, setOffset] = useState(10);
   const [total, setTotal] = useState(0);
   function handleSearch() {
@@ -36,11 +37,15 @@ export default function BrowsePage() {
   }
   async function getMoreManga() {
     try {
+      if (mangas.length >= total) return;
+      setLoadingMore(true);
       const dataManga = await getMangas(searchValue, 10, offset);
       setMangas((prevMangas) => [...prevMangas, ...dataManga]);
       setOffset((prevOffset) => prevOffset + 10);
     } catch (error) {
       console.error("Failed to fetch more mangas.", error);
+    } finally {
+      setLoadingMore(false);
     }
   }
   useLayoutEffect(() => {
@@ -78,7 +83,12 @@ export default function BrowsePage() {
             />
           )}
           onEndReachedThreshold={0.5}
-          onEndReached={debounceGetMoreManga}
+          onEndReached={!loadingMore ? debounceGetMoreManga : null}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator style={style.centerContent} />
+            ) : null
+          }
           numColumns={2}
           columnWrapperStyle={style.row}
         />
