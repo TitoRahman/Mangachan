@@ -10,27 +10,39 @@ export default function BrowsePage() {
   const [searchValue, setSearchValue] = useState("");
   const [mangas, setMangas] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [offset, setOffset] = useState(10);
+  const [total, setTotal] = useState(0);
   function handleSearch() {
     setMangas([]);
     setLoading(true);
+    setTotal(0);
+    setOffset(10);
     debounceGetManga();
   }
 
   const debounceGetManga = debounce(() => getManga(), 500);
+  const debounceGetMoreManga = debounce(() => getMoreManga(), 500);
 
   async function getManga() {
-    console.log("Fetching mangas with title", searchValue);
     try {
       const dataManga = await getMangas(searchValue);
       setMangas(dataManga);
+      setTotal(dataManga.total);
     } catch (error) {
       console.error("Failed to fetch mangas.", error);
     } finally {
       setLoading(false);
     }
   }
-
+  async function getMoreManga() {
+    try {
+      const dataManga = await getMangas(searchValue, 10, offset);
+      setMangas((prevMangas) => [...prevMangas, ...dataManga]);
+      setOffset((prevOffset) => prevOffset + 10);
+    } catch (error) {
+      console.error("Failed to fetch more mangas.", error);
+    }
+  }
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -52,6 +64,8 @@ export default function BrowsePage() {
     <View style={style.container}>
       {loading ? (
         <ActivityIndicator style={style.centerContent} />
+      ) : mangas.length === 0 ? (
+        <Text style={style.centerContent}>No results found.</Text>
       ) : (
         <FlatList
           data={mangas}
@@ -63,6 +77,8 @@ export default function BrowsePage() {
               title={manga.title}
             />
           )}
+          onEndReachedThreshold={0.5}
+          onEndReached={debounceGetMoreManga}
           numColumns={2}
           columnWrapperStyle={style.row}
         />
