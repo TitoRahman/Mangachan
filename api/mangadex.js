@@ -93,9 +93,16 @@ export const getChapterUri = async (chapterId, page = -1) => {
     const chapterHash = response.data.chapter.hash;
 
     if (page === -1) {
-      return response.data.chapter.data.map(
+      const pages = response.data.chapter.data.map(
         (c) => `https://uploads.mangadex.org/data/${chapterHash}/${c}`
       );
+      console.log(
+        "Fetched successfully all pages for chapterId",
+        chapterId,
+        ":",
+        pages.length
+      );
+      return pages;
     } else {
       const pageIndex = page - 1;
       if (pageIndex < 0 || pageIndex >= response.data.chapter.data.length) {
