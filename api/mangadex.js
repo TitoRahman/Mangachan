@@ -48,11 +48,10 @@ export const getVolumes = async (mangaId, limit = 10, offset = 0) => {
         publishedAt: chapter.attributes.publishAt,
         total: response.data.total,
       }))
-
       .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt));
 
     console.log(
-      `Fetched successfully ${vol.length} chapter(s) for mangaId ${mangaId}, total ${response.data.total}`
+      `Fetched successfully ${vol.length} chapter(s) for mangaId ${mangaId}, offset ${offset}, total ${response.data.total}`
     );
     return vol;
   } catch (error) {
@@ -61,6 +60,27 @@ export const getVolumes = async (mangaId, limit = 10, offset = 0) => {
   }
 };
 
+export const getAllVolumes = async (mangaId) => {
+  try {
+    let allVolumes = [];
+    let currentOffset = 0;
+    let totalVolumes = 0;
+
+    do {
+      const dataVolumes = await getVolumes(mangaId, 500, currentOffset);
+      allVolumes = [...allVolumes, ...dataVolumes];
+      totalVolumes = dataVolumes.total;
+      currentOffset += 500;
+    } while (allVolumes.length < totalVolumes);
+
+    return allVolumes.sort(
+      (a, b) => new Date(a.publishedAt) - new Date(b.publishedAt)
+    );
+  } catch (error) {
+    console.error(`Error fetching all volumes for mangaId ${mangaId}:`, error);
+    throw error;
+  }
+};
 /**
  * Fetches the URI for the pages of a chapter.
  * @param {string} chapterId - The ID of the chapter.
