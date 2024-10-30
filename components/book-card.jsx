@@ -2,24 +2,31 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { colors } from "../constant/colors";
 import React from "react";
 import CountryFlag from "react-native-country-flag";
-import { Link, useNavigation } from "expo-router";
+import { Link } from "expo-router";
 const defaultImage = require("../assets/imgNotFound.jpg");
 const cardSize = { width: 170 };
 export default function CardBook({
   id,
   title,
   cover,
+  description = "",
   langIso = "id",
   progress = 0,
+  status = "ongoing",
 }) {
-  const navigation = useNavigation();
-
   return (
     <Link
       href={{
         pathname: "/manga/detail",
-        params: { mangaId: id, title: title },
+        params: {
+          mangaId: id,
+          title: title,
+          cover: cover,
+          description: description,
+          status: status,
+        },
       }}
+      style={{ margin: 8 }}
     >
       <View style={styles.card}>
         <Image
@@ -65,9 +72,9 @@ export default function CardBook({
 const styles = StyleSheet.create({
   card: {
     margin: 10,
+    width: cardSize.width,
     flexDirection: "column",
     justifyContent: "start",
-    width: cardSize.width,
     backgroundColor: "white",
   },
   cardImage: {

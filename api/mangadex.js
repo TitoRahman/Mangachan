@@ -34,25 +34,29 @@ export const getMangaCoverUri = async (id, coverId, resolution) => {
  *   - {string} chapter - The chapter number.
  *   - {string} volume - The volume number.
  */
-export const getVolumes = async (mangaId) => {
+export const getVolumes = async (mangaId, limit = 10, offset = 0) => {
   try {
-    const response = await axios.get(`${baseUrl}/chapter`, {
-      params: { manga: mangaId },
+    const response = await axios.get(`${baseUrl}/manga/${mangaId}/feed`, {
+      params: { limit: limit, offset: offset, translatedLanguage: ["en"] },
     });
-    const vol = response.data.data.map((chapter) => ({
-      id: chapter.id,
-      title: chapter.attributes.title,
-      chapter: chapter.attributes.chapter,
-      volume: chapter.attributes.volume,
-      publishedAt: chapter.attributes.publishAt,
-    }));
+    const vol = response.data.data
+      .map((chapter) => ({
+        id: chapter.id,
+        title: chapter.attributes.title,
+        chapter: chapter.attributes.chapter,
+        volume: chapter.attributes.volume,
+        publishedAt: chapter.attributes.publishAt,
+        total: response.data.total,
+      }))
+
+      .sort((a, b) => new Date(a.publishedAt) - new Date(b.publishedAt));
+
     console.log(
-      `Fetched successfully ${vol.length} chapter for mangaId ${mangaId}.`
+      `Fetched successfully ${vol.length} chapter(s) for mangaId ${mangaId}, total ${response.data.total}`
     );
-    console.log(vol);
     return vol;
   } catch (error) {
-    console.error(`Failed to fetch chapters for mangaId ${mangaId}:`, error);
+    console.error(`Error fetching volumes for mangaId ${mangaId}:`, error);
     throw error;
   }
 };
@@ -131,7 +135,10 @@ export const getMangas = async (
           title: manga.attributes.title.en,
           description: manga.attributes.description.en,
           coverArt: coverArtUri,
+          volume: manga.attributes.lastVolume,
+          chapter: manga.attributes.lastChapter,
           total: response.data.total,
+          status: manga.attributes.status,
         };
       })
     );

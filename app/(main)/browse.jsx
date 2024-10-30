@@ -23,10 +23,6 @@ export default function BrowsePage() {
     debounceGetManga();
   }
 
-  useEffect(() => {
-    getManga();
-  }, []);
-
   const debounceGetManga = debounce(() => getManga(), 500);
   const debounceGetMoreManga = debounce(() => getMoreManga(), 500);
 
@@ -74,9 +70,9 @@ export default function BrowsePage() {
   return (
     <View style={style.container}>
       {loading ? (
-        <ActivityIndicator style={style.centerContent} />
+        <ActivityIndicator />
       ) : mangas.length === 0 ? (
-        <Text style={style.centerContent}>No results found 🔍</Text>
+        <Text>No results found 🔍</Text>
       ) : (
         <FlatList
           data={mangas}
@@ -87,15 +83,13 @@ export default function BrowsePage() {
               key={manga.id}
               title={manga.title}
               id={manga.id}
+              description={manga.description}
+              status={manga.status}
             />
           )}
           onEndReachedThreshold={0.5}
           onEndReached={!loadingMore ? debounceGetMoreManga : null}
-          ListFooterComponent={
-            loadingMore ? (
-              <ActivityIndicator style={style.centerContent} />
-            ) : null
-          }
+          ListFooterComponent={loadingMore ? <ActivityIndicator /> : null}
           numColumns={2}
           columnWrapperStyle={style.row}
         />
@@ -105,9 +99,6 @@ export default function BrowsePage() {
 }
 const style = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  centerContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
